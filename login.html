@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Ledger - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .demo-credentials {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .demo-credentials strong {
+            color: #333;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>💰 Club Ledger</h1>
+            <p>Secure Member Management</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="btn-login">Sign In</button>
+            
+            <div class="loading" id="loading">
+                <p>Verifying credentials...</p>
+            </div>
+        </form>
+        
+        <div class="info-box">
+            <strong>ℹ️ Secure Access</strong>
+            <p style="margin-top: 8px;">Only authorized club members can access this system. Your credentials are validated locally for security.</p>
+            <div class="demo-credentials">
+                <strong>Demo Account:</strong><br>
+                Username: <code style="background: white; padding: 2px 6px; border-radius: 3px;">admin</code><br>
+                Password: <code style="background: white; padding: 2px 6px; border-radius: 3px;">secure123</code>
+            </div>
+        </div>
+    </div>
+    
+    <script src="security.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
+            
+            errorMessage.style.display = 'none';
+            loading.style.display = 'block';
+            
+            // Simulate server-side authentication delay
+            setTimeout(() => {
+                if (validateCredentials(username, password)) {
+                    // Encrypt and store session
+                    const sessionToken = generateSessionToken();
+                    sessionStorage.setItem('sessionToken', sessionToken);
+                    sessionStorage.setItem('currentUser', username);
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    // Log access
+                    logAccess(username, 'LOGIN', 'Success');
+                    
+                    loading.style.display = 'none';
+                    window.location.href = 'index.html';
+                } else {
+                    errorMessage.textContent = '❌ Invalid username or password';
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                    
+                    logAccess(username, 'LOGIN', 'Failed - Invalid credentials');
+                    
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            }, 800);
+        }
+        
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            if (isUserLoggedIn()) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
