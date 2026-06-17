@@ -52,7 +52,18 @@
             background: #5568d3;
         }
         
-        .stats-grid {
+        .report-section {
+            margin-bottom: 40px;
+        }
+        
+        .report-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .stat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
@@ -65,35 +76,28 @@
             padding: 20px;
             border-radius: 8px;
             text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
-        .stat-card h3 {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 10px;
+        .stat-label {
+            font-size: 12px;
             opacity: 0.9;
+            margin-bottom: 10px;
         }
         
-        .stat-card .value {
+        .stat-value {
             font-size: 28px;
             font-weight: 700;
         }
         
-        .section {
-            margin-top: 40px;
-        }
-        
-        .section h2 {
-            color: #333;
+        .table-container {
+            overflow-x: auto;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
         }
         
         th {
@@ -107,21 +111,12 @@
         
         td {
             padding: 12px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #ddd;
+            color: #666;
         }
         
         tr:hover {
             background: #f8f9fa;
-        }
-        
-        .amount-positive {
-            color: #27ae60;
-            font-weight: 600;
-        }
-        
-        .amount-negative {
-            color: #e74c3c;
-            font-weight: 600;
         }
         
         .empty-state {
@@ -130,218 +125,239 @@
             padding: 40px 20px;
         }
         
-        .btn-export {
-            background: #667eea;
+        .btn-print {
+            background: #764ba2;
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: 600;
-            margin-bottom: 20px;
         }
         
-        .btn-export:hover {
-            background: #5568d3;
+        .btn-print:hover {
+            background: #653a8a;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .btn-back, .btn-print {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Reports</h1>
-            <button class="btn-back" onclick="location.href='index.html'">← Back</button>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Contributions</h3>
-                <div class="value" id="totalContributions">₹0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total Expenses</h3>
-                <div class="value" id="totalExpenses">₹0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Current Balance</h3>
-                <div class="value" id="balance">₹0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total Members</h3>
-                <div class="value" id="totalMembers">0</div>
+            <h1>📊 Financial Reports</h1>
+            <div>
+                <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+                <button class="btn-back" onclick="location.href='index.html'">← Back</button>
             </div>
         </div>
         
-        <button class="btn-export" onclick="exportReport()">📥 Export Report (CSV)</button>
-        
-        <div class="section">
-            <h2>💰 Top Contributors</h2>
-            <div id="topContributors"></div>
+        <!-- Summary Section -->
+        <div class="report-section">
+            <h2>Summary</h2>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Contributions</div>
+                    <div class="stat-value" id="totalContributions">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value" id="totalExpenses">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Current Balance</div>
+                    <div class="stat-value" id="currentBalance">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Members</div>
+                    <div class="stat-value" id="totalMembers">0</div>
+                </div>
+            </div>
         </div>
         
-        <div class="section">
-            <h2>📂 Expense Breakdown</h2>
-            <div id="expenseBreakdown"></div>
+        <!-- Expense Breakdown Section -->
+        <div class="report-section">
+            <h2>Expense Breakdown by Category</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Count</th>
+                            <th>Total Amount</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseBreakdown">
+                    </tbody>
+                </table>
+            </div>
         </div>
         
-        <div class="section">
-            <h2>📋 Contribution Summary</h2>
-            <div id="contributionSummary"></div>
+        <!-- Top Contributors Section -->
+        <div class="report-section">
+            <h2>Top Contributors</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Contribution Count</th>
+                            <th>Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topContributors">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Recent Transactions Section -->
+        <div class="report-section">
+            <h2>Recent Transactions (Last 20)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>By</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTransactions">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     
+    <script src="security.js"></script>
     <script>
-        function loadReports() {
-            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
-            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-            const members = JSON.parse(localStorage.getItem('members')) || [];
+        // Enforce login on page load
+        enforceLogin();
+        
+        function generateReports() {
+            const contributions = getSecureData('contributions');
+            const expenses = getSecureData('expenses');
             
             // Calculate totals
-            const totalContributions = contributions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-            const totalExpenses = expenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+            const totalContributions = contributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+            const totalExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
             const balance = totalContributions - totalExpenses;
             
+            // Update summary cards
             document.getElementById('totalContributions').textContent = '₹' + totalContributions.toFixed(2);
             document.getElementById('totalExpenses').textContent = '₹' + totalExpenses.toFixed(2);
-            document.getElementById('balance').textContent = '₹' + balance.toFixed(2);
-            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('currentBalance').textContent = '₹' + balance.toFixed(2);
             
-            // Top Contributors
-            const contributorMap = {};
-            contributions.forEach(item => {
-                contributorMap[item.memberName] = (contributorMap[item.memberName] || 0) + parseFloat(item.amount);
+            // Get unique members
+            const uniqueMembers = new Set(contributions.map(c => c.memberName));
+            document.getElementById('totalMembers').textContent = uniqueMembers.size;
+            
+            // Expense breakdown by category
+            const expensesByCategory = {};
+            expenses.forEach(e => {
+                if (!expensesByCategory[e.category]) {
+                    expensesByCategory[e.category] = { count: 0, amount: 0 };
+                }
+                expensesByCategory[e.category].count++;
+                expensesByCategory[e.category].amount += parseFloat(e.amount || 0);
             });
             
-            const topContributors = Object.entries(contributorMap)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-            
-            const topContributorsDiv = document.getElementById('topContributors');
-            if (topContributors.length === 0) {
-                topContributorsDiv.innerHTML = '<div class="empty-state"><p>No contributions yet</p></div>';
+            const expenseBreakdownBody = document.getElementById('expenseBreakdown');
+            if (Object.keys(expensesByCategory).length === 0) {
+                expenseBreakdownBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No expenses recorded</td></tr>';
             } else {
-                topContributorsDiv.innerHTML = `
-                    <table>
-                        <thead>
+                expenseBreakdownBody.innerHTML = Object.entries(expensesByCategory)
+                    .sort((a, b) => b[1].amount - a[1].amount)
+                    .map(([category, data]) => {
+                        const percentage = ((data.amount / totalExpenses) * 100).toFixed(1);
+                        return `
                             <tr>
-                                <th>Member Name</th>
-                                <th>Amount</th>
+                                <td>${sanitizeHTML(category)}</td>
+                                <td>${data.count}</td>
+                                <td>₹${data.amount.toFixed(2)}</td>
+                                <td>${percentage}%</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            ${topContributors.map(([name, amount]) => `
-                                <tr>
-                                    <td>${name}</td>
-                                    <td class="amount-positive">₹${amount.toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
+                        `;
+                    }).join('');
             }
             
-            // Expense Breakdown
-            const categoryMap = {};
-            expenses.forEach(item => {
-                categoryMap[item.category] = (categoryMap[item.category] || 0) + parseFloat(item.amount);
+            // Top contributors
+            const contributorTotals = {};
+            contributions.forEach(c => {
+                if (!contributorTotals[c.memberName]) {
+                    contributorTotals[c.memberName] = { count: 0, amount: 0 };
+                }
+                contributorTotals[c.memberName].count++;
+                contributorTotals[c.memberName].amount += parseFloat(c.amount || 0);
             });
             
-            const expenseBreakdown = Object.entries(categoryMap)
-                .sort((a, b) => b[1] - a[1]);
-            
-            const expenseBreakdownDiv = document.getElementById('expenseBreakdown');
-            if (expenseBreakdown.length === 0) {
-                expenseBreakdownDiv.innerHTML = '<div class="empty-state"><p>No expenses logged yet</p></div>';
+            const topContributorsBody = document.getElementById('topContributors');
+            if (Object.keys(contributorTotals).length === 0) {
+                topContributorsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #999;">No contributions recorded</td></tr>';
             } else {
-                expenseBreakdownDiv.innerHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th>Percentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${expenseBreakdown.map(([category, amount]) => `
-                                <tr>
-                                    <td>${category}</td>
-                                    <td class="amount-negative">₹${amount.toFixed(2)}</td>
-                                    <td>${totalExpenses > 0 ? ((amount / totalExpenses) * 100).toFixed(1) : 0}%</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
+                topContributorsBody.innerHTML = Object.entries(contributorTotals)
+                    .sort((a, b) => b[1].amount - a[1].amount)
+                    .slice(0, 10)
+                    .map(([member, data]) => `
+                        <tr>
+                            <td>${sanitizeHTML(member)}</td>
+                            <td>${data.count}</td>
+                            <td>₹${data.amount.toFixed(2)}</td>
+                        </tr>
+                    `).join('');
             }
             
-            // Contribution Summary
-            const contributionSummaryDiv = document.getElementById('contributionSummary');
-            if (contributions.length === 0) {
-                contributionSummaryDiv.innerHTML = '<div class="empty-state"><p>No contributions yet</p></div>';
+            // Recent transactions
+            const allTransactions = [
+                ...contributions.map(c => ({
+                    date: c.date,
+                    type: 'Contribution',
+                    description: sanitizeHTML(c.description || c.memberName),
+                    amount: c.amount,
+                    by: c.recordedBy,
+                    sortDate: new Date(c.date).getTime()
+                })),
+                ...expenses.map(e => ({
+                    date: e.date,
+                    type: 'Expense',
+                    description: sanitizeHTML(e.description || e.category),
+                    amount: -e.amount,
+                    by: e.recordedBy,
+                    sortDate: new Date(e.date).getTime()
+                }))
+            ].sort((a, b) => b.sortDate - a.sortDate).slice(0, 20);
+            
+            const recentTransactionsBody = document.getElementById('recentTransactions');
+            if (allTransactions.length === 0) {
+                recentTransactionsBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No transactions recorded</td></tr>';
             } else {
-                const sorted = [...contributions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
-                contributionSummaryDiv.innerHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Member</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${sorted.map(item => `
-                                <tr>
-                                    <td>${item.memberName}</td>
-                                    <td>${new Date(item.date).toLocaleDateString()}</td>
-                                    <td class="amount-positive">₹${item.amount.toFixed(2)}</td>
-                                    <td>${item.description || '-'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
+                recentTransactionsBody.innerHTML = allTransactions.map(t => `
+                    <tr>
+                        <td>${new Date(t.date).toLocaleDateString()}</td>
+                        <td><strong>${t.type}</strong></td>
+                        <td>${t.description}</td>
+                        <td style="color: ${t.amount > 0 ? '#27ae60' : '#e74c3c'}; font-weight: 600;">
+                            ${t.amount > 0 ? '+' : ''}₹${Math.abs(t.amount).toFixed(2)}
+                        </td>
+                        <td>${sanitizeHTML(t.by || 'Unknown')}</td>
+                    </tr>
+                `).join('');
             }
         }
         
-        function exportReport() {
-            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
-            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-            
-            let csv = 'CLUB LEDGER REPORT\n';
-            csv += 'Generated: ' + new Date().toLocaleString() + '\n\n';
-            
-            csv += 'CONTRIBUTIONS\n';
-            csv += 'Member Name,Amount,Date,Description\n';
-            contributions.forEach(item => {
-                csv += `"${item.memberName}",${item.amount},"${item.date}","${item.description || ''}"\n`;
-            });
-            
-            csv += '\nEXPENSES\n';
-            csv += 'Category,Amount,Date,Paid By,Description\n';
-            expenses.forEach(item => {
-                csv += `"${item.category}",${item.amount},"${item.date}","${item.paidBy}","${item.description || ''}"\n`;
-            });
-            
-            const totalContributions = contributions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-            const totalExpenses = expenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-            
-            csv += '\nSUMMARY\n';
-            csv += `Total Contributions,${totalContributions.toFixed(2)}\n`;
-            csv += `Total Expenses,${totalExpenses.toFixed(2)}\n`;
-            csv += `Balance,${(totalContributions - totalExpenses).toFixed(2)}\n`;
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'club-ledger-report-' + new Date().toISOString().split('T')[0] + '.csv';
-            a.click();
-        }
-        
-        loadReports();
+        generateReports();
+        logAccess(getCurrentUser(), 'VIEW_REPORTS', 'Success');
     </script>
 </body>
 </html>
