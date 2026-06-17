@@ -149,6 +149,24 @@
             color: #999;
             padding: 40px 20px;
         }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +175,9 @@
             <h1>➕ Record Contribution</h1>
             <button class="btn-back" onclick="location.href='index.html'">← Back</button>
         </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
         
         <div>
             <h3 style="margin-bottom: 20px;">Add New Contribution</h3>
@@ -190,57 +211,90 @@
         </div>
     </div>
     
+    <script src="security.js"></script>
     <script>
+        // Enforce login on page load
+        enforceLogin();
+        
         // Set today's date as default
         document.getElementById('date').valueAsDate = new Date();
         
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = '✅ ' + message;
+            successDiv.style.display = 'block';
+            setTimeout(() => { successDiv.style.display = 'none'; }, 3000);
+        }
+        
         function addContribution() {
-            const memberName = document.getElementById('memberName').value.trim();
-            const amount = parseFloat(document.getElementById('amount').value);
-            const date = document.getElementById('date').value;
-            const description = document.getElementById('description').value.trim();
+            const rawData = {
+                memberName: document.getElementById('memberName').value.trim(),
+                amount: document.getElementById('amount').value,
+                date: document.getElementById('date').value,
+                description: document.getElementById('description').value.trim()
+            };
             
-            if (!memberName) {
-                alert('Please enter member name');
+            // Validate input
+            const validation = validateContribution(rawData);
+            
+            if (!validation.valid) {
+                validation.errors.forEach(error => showError(error));
                 return;
             }
             
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
+            const data = validation.data;
             
-            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+            const contributions = getSecureData('contributions');
             contributions.push({
                 id: Date.now(),
-                memberName: memberName,
-                amount: amount,
-                date: date || new Date().toISOString().split('T')[0],
-                description: description,
-                recordedDate: new Date().toLocaleString()
+                memberName: data.memberName,
+                amount: data.amount,
+                date: data.date,
+                description: data.description,
+                recordedDate: new Date().toLocaleString(),
+                recordedBy: getCurrentUser()
             });
             
-            localStorage.setItem('contributions', JSON.stringify(contributions));
-            document.getElementById('memberName').value = '';
-            document.getElementById('amount').value = '';
-            document.getElementById('description').value = '';
-            document.getElementById('date').valueAsDate = new Date();
-            
-            loadContributions();
-            alert('Contribution recorded successfully!');
+            if (storeSecureData('contributions', contributions)) {
+                document.getElementById('memberName').value = '';
+                document.getElementById('amount').value = '';
+                document.getElementById('description').value = '';
+                document.getElementById('date').valueAsDate = new Date();
+                
+                logAccess(getCurrentUser(), 'ADD_CONTRIBUTION', 'Success - ₹' + data.amount);
+                loadContributions();
+                showSuccess('Contribution recorded successfully!');
+            } else {
+                showError('Failed to save contribution. Please try again.');
+                logAccess(getCurrentUser(), 'ADD_CONTRIBUTION', 'Failed');
+            }
         }
         
         function deleteContribution(id) {
             if (confirm('Are you sure you want to delete this contribution?')) {
-                let contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+                let contributions = getSecureData('contributions');
+                const deleted = contributions.find(c => c.id === id);
                 contributions = contributions.filter(c => c.id !== id);
-                localStorage.setItem('contributions', JSON.stringify(contributions));
-                loadContributions();
+                
+                if (storeSecureData('contributions', contributions)) {
+                    logAccess(getCurrentUser(), 'DELETE_CONTRIBUTION', 'Success - ₹' + (deleted?.amount || 0));
+                    loadContributions();
+                    showSuccess('Contribution deleted successfully!');
+                } else {
+                    showError('Failed to delete contribution.');
+                }
             }
         }
         
         function loadContributions() {
-            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+            const contributions = getSecureData('contributions');
             const contributionsList = document.getElementById('contributionsList');
             
             if (contributions.length === 0) {
@@ -254,9 +308,10 @@
             contributionsList.innerHTML = sorted.map(contribution => `
                 <div class="contribution-card">
                     <div class="contribution-info">
-                        <h3>${contribution.memberName}</h3>
+                        <h3>${sanitizeHTML(contribution.memberName)}</h3>
                         <p>📅 ${new Date(contribution.date).toLocaleDateString()}</p>
-                        ${contribution.description ? `<p>${contribution.description}</p>` : ''}
+                        ${contribution.description ? `<p>${sanitizeHTML(contribution.description)}</p>` : ''}
+                        <p style="font-size: 12px; color: #999; margin-top: 5px;">By: ${sanitizeHTML(contribution.recordedBy || 'Unknown')}</p>
                     </div>
                     <div style="text-align: right;">
                         <div class="amount">₹${contribution.amount.toFixed(2)}</div>
@@ -267,6 +322,7 @@
         }
         
         loadContributions();
+        logAccess(getCurrentUser(), 'VIEW_CONTRIBUTIONS', 'Success');
     </script>
 </body>
 </html>
