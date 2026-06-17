@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Contribution - Club Ledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .btn-back {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-back:hover {
+            background: #5568d3;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .btn-submit:hover {
+            background: #5568d3;
+        }
+        
+        .contributions-list {
+            margin-top: 40px;
+        }
+        
+        .contribution-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contribution-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .contribution-info p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➕ Record Contribution</h1>
+            <button class="btn-back" onclick="location.href='index.html'">← Back</button>
+        </div>
+        
+        <div>
+            <h3 style="margin-bottom: 20px;">Add New Contribution</h3>
+            
+            <div class="form-group">
+                <label>Member Name *</label>
+                <input type="text" id="memberName" placeholder="Enter member name" />
+            </div>
+            
+            <div class="form-group">
+                <label>Amount (₹) *</label>
+                <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" />
+            </div>
+            
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="date" />
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" placeholder="Add notes about this contribution..."></textarea>
+            </div>
+            
+            <button class="btn-submit" onclick="addContribution()">Record Contribution</button>
+        </div>
+        
+        <div class="contributions-list">
+            <h3 style="margin-bottom: 15px;">Recent Contributions</h3>
+            <div id="contributionsList"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        
+        function addContribution() {
+            const memberName = document.getElementById('memberName').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = document.getElementById('date').value;
+            const description = document.getElementById('description').value.trim();
+            
+            if (!memberName) {
+                alert('Please enter member name');
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+            contributions.push({
+                id: Date.now(),
+                memberName: memberName,
+                amount: amount,
+                date: date || new Date().toISOString().split('T')[0],
+                description: description,
+                recordedDate: new Date().toLocaleString()
+            });
+            
+            localStorage.setItem('contributions', JSON.stringify(contributions));
+            document.getElementById('memberName').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('date').valueAsDate = new Date();
+            
+            loadContributions();
+            alert('Contribution recorded successfully!');
+        }
+        
+        function deleteContribution(id) {
+            if (confirm('Are you sure you want to delete this contribution?')) {
+                let contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+                contributions = contributions.filter(c => c.id !== id);
+                localStorage.setItem('contributions', JSON.stringify(contributions));
+                loadContributions();
+            }
+        }
+        
+        function loadContributions() {
+            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+            const contributionsList = document.getElementById('contributionsList');
+            
+            if (contributions.length === 0) {
+                contributionsList.innerHTML = '<div class="empty-state"><p>No contributions recorded yet.</p></div>';
+                return;
+            }
+            
+            // Sort by date descending
+            const sorted = [...contributions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            contributionsList.innerHTML = sorted.map(contribution => `
+                <div class="contribution-card">
+                    <div class="contribution-info">
+                        <h3>${contribution.memberName}</h3>
+                        <p>📅 ${new Date(contribution.date).toLocaleDateString()}</p>
+                        ${contribution.description ? `<p>${contribution.description}</p>` : ''}
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="amount">₹${contribution.amount.toFixed(2)}</div>
+                        <button class="btn-delete" onclick="deleteContribution(${contribution.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        loadContributions();
+    </script>
+</body>
+</html>

@@ -43,6 +43,27 @@
             font-size: 14px;
         }
         
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .balance-card h2 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .balance-card .amount {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
         .button-group {
             display: flex;
             flex-direction: column;
@@ -87,12 +108,33 @@
         <h1>💰 Club Ledger</h1>
         <p class="subtitle">Manage contributions and expenses for charity and social work</p>
         
+        <div class="balance-card">
+            <h2>Current Balance</h2>
+            <div class="amount" id="balance">₹0</div>
+        </div>
+        
         <div class="button-group">
-            <button class="btn-primary" onclick="alert('Members section coming soon!')">View Members</button>
-            <button class="btn-primary" onclick="alert('Contributions section coming soon!')">Record Contribution</button>
-            <button class="btn-secondary" onclick="alert('Expenses section coming soon!')">Log Expense</button>
-            <button class="btn-secondary" onclick="alert('Reports section coming soon!')">View Reports</button>
+            <button class="btn-primary" onclick="location.href='members.html'">👥 View Members</button>
+            <button class="btn-primary" onclick="location.href='contribution.html'">➕ Record Contribution</button>
+            <button class="btn-secondary" onclick="location.href='expense.html'">➖ Log Expense</button>
+            <button class="btn-secondary" onclick="location.href='reports.html'">📊 View Reports</button>
         </div>
     </div>
+    
+    <script>
+        // Load and display balance
+        function updateBalance() {
+            const contributions = JSON.parse(localStorage.getItem('contributions')) || [];
+            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            
+            const totalContributions = contributions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+            const totalExpenses = expenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+            const balance = totalContributions - totalExpenses;
+            
+            document.getElementById('balance').textContent = '₹' + balance.toFixed(2);
+        }
+        
+        updateBalance();
+    </script>
 </body>
 </html>
