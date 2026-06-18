@@ -170,15 +170,17 @@
                 return;
             }
             
-            membersGrid.innerHTML = members.map(member => {
-                const total = getMemberTotal(member);
-                return `
-                    <div class="member-card">
-                        <div class="member-name">${sanitizeHTML(member)}</div>
-                        <div class="member-info">👤 Member ID: ${member.substring(0, 3).toUpperCase()}</div>
-                        <div class="member-info">💳 Contributions: ${getSecureData('contributions').filter(c => c.memberName === member).length}</div>
-                        <div class="member-total">Total: ₹${total.toFixed(2)}</div>
-                    </div>
+          membersGrid.innerHTML = members.map(member => {
+    const total = getMemberTotal(member);
+    return `
+    <div class="member-card">
+        <div class="member-name">${sanitizeHTML(member)}</div>
+        <div class="member-info"> Member ID: ${member.substring(0,3).toUpperCase()}</div>
+        <div class="member-info"> Contributions: ${getSecureData('contributions').filter(c => c.memberName === member).length}</div>
+        <div class="member-total">Total: ₹${total.toFixed(2)}</div>
+    </div>
+    `;
+}).join('');
                 `;
             }).join('');
         }
