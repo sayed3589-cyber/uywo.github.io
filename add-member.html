@@ -25,28 +25,36 @@ cursor:pointer;
 
 <h2>Add Member</h2>
 
-<input type="text" id="memberName" placeholder="Member Name">
+<input type="text" id="name" placeholder="Member Name">
+
+<input type="text" id="mobile" placeholder="Mobile Number">
+
+<input type="text" id="address" placeholder="Address">
+
+<input type="date" id="joiningDate">
+
+<input type="number" id="monthlyContribution" placeholder="Monthly Contribution">
 
 <button onclick="saveMember()">Save Member</button>
 
 <script>
 function saveMember() {
-    let name = document.getElementById('memberName').value;
 
-    if(!name){
-        alert('Enter member name');
-        return;
-    }
+    const member = {
+        name: document.getElementById('name').value,
+        mobile: document.getElementById('mobile').value,
+        address: document.getElementById('address').value,
+        joiningDate: document.getElementById('joiningDate').value,
+        monthlyContribution: document.getElementById('monthlyContribution').value
+    };
 
     let members = JSON.parse(localStorage.getItem('members')) || [];
-    members.push(name);
+
+    members.push(member);
 
     localStorage.setItem('members', JSON.stringify(members));
 
     alert('Member Added Successfully');
-    window.location.href='members.html';
-}
-</script>
 
-</body>
-</html>
+    window.location.href = 'members.html';
+}
