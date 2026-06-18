@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Member</title>
+<style>
+body{
+font-family:Arial,sans-serif;
+padding:20px;
+}
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+button{
+padding:10px 20px;
+background:#667eea;
+color:white;
+border:none;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>Add Member</h2>
+
+<input type="text" id="memberName" placeholder="Member Name">
+
+<button onclick="saveMember()">Save Member</button>
+
+<script>
+function saveMember() {
+    let name = document.getElementById('memberName').value;
+
+    if(!name){
+        alert('Enter member name');
+        return;
+    }
+
+    let members = JSON.parse(localStorage.getItem('members')) || [];
+    members.push(name);
+
+    localStorage.setItem('members', JSON.stringify(members));
+
+    alert('Member Added Successfully');
+    window.location.href='members.html';
+}
+</script>
+
+</body>
+</html>
