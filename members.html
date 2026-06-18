@@ -162,34 +162,27 @@
         }
         
         function displayMembers(membersToShow = null) {
-            const members = membersToShow || getUniqueMembers();
+        const members = membersToShow || JSON.parse(localStorage.getItem('members')) || [];
             const membersGrid = document.getElementById('membersGrid');
             
             if (members.length === 0) {
                 membersGrid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><p>No members found. Start by recording contributions.</p></div>';
                 return;
             }
-            
-          membersGrid.innerHTML = members.map(member => {
-    const total = getMemberTotal(member);
-    return `
-    <div class="member-card">
-        <div class="member-name">${sanitizeHTML(member)}</div>
-        <div class="member-info"> Member ID: ${member.substring(0,3).toUpperCase()}</div>
-        <div class="member-info"> Contributions: ${getSecureData('contributions').filter(c => c.memberName === member).length}</div>
-        <div class="member-total">Total: ₹${total.toFixed(2)}</div>
-    </div>
-    `;
-}).join('');
-                `;
-            }).join('');
-        }
-        
+      membersGrid.innerHTML = members.map(member => `
+<div class="member-card">
+    <div class="member-name">${member.name}</div>
+    <div class="member-info"> Mobile: ${member.mobile}</div>
+    <div class="member-info"> Address: ${member.address}</div>
+    <div class="member-info"> Joining Date: ${member.joiningDate}</div>
+    <div class="member-info"> Monthly Contribution: ₹${member.monthlyContribution}</div>
+</div>
+`).join('');        
         function filterMembers() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            const allMembers = getUniqueMembers();
+            const allMembers = JSON.parse(localStorage.getItem('members')) || [];
             const filtered = allMembers.filter(member => 
-                member.toLowerCase().includes(searchTerm)
+            member.name.toLowerCase().includes(searchTerm)
             );
             displayMembers(filtered);
         }
