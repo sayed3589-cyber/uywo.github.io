@@ -45,10 +45,18 @@ cursor:pointer;
 
 <input type="number" id="monthlyContribution" placeholder="Monthly Contribution">
 
-<button onclick="saveMember()">Save Member</button>
+<button onclick="alert('Button Working'); saveMember();">
+    Save Member
+</button>
 
 <script>
 function saveMember() {
+    alert("Save button clicked");
+
+    const member = {
+        ...
+    };
+}
 
     const member = {
         name: document.getElementById('name').value,
@@ -68,3 +76,6 @@ function saveMember() {
 
     window.location.href = 'members.html';
 }
+</script>
+</body>
+</html>
