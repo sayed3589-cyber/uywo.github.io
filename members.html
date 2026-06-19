@@ -136,7 +136,6 @@
         <div class="members-grid" id="membersGrid"></div>
     </div>
     
-    <script src="security.js"></script>
     <script>
         // Enforce login on page load
         enforceLogin();
@@ -169,20 +168,23 @@
                 membersGrid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><p>No members found. Start by recording contributions.</p></div>';
                 return;
             }
-  membersGrid.innerHTML = members.map(member => {
+ membersGrid.innerHTML = members.map(member => {
     return `
     <div class="member-card">
         <div class="member-name">${member.name}</div>
-        <div class="member-info"> Mobile: ${member.mobile}</div>
-        <div class="member-info"> Address: ${member.address}</div>
-        <div class="member-info"> Joining Date: ${member.joiningDate}</div>
-        <div class="member-info"> Monthly Contribution: ₹${member.monthlyContribution}</div>
+        <div class="member-info">Mobile: ${member.mobile}</div>
+        <div class="member-info">Address: ${member.address}</div>
+        <div class="member-info">Joining Date: ${member.joiningDate}</div>
+        <div class="member-info">Monthly Contribution: ₹${member.monthlyContribution}</div>
     </div>
     `;
 }).join('');
+}
 
-        function filterMembers() {
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+function filterMembers() {
+    const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+    ...
+}
             const allMembers = JSON.parse(localStorage.getItem('members')) || [];
             const filtered = allMembers.filter(member => 
             member.name.toLowerCase().includes(searchTerm)
@@ -191,7 +193,6 @@
         }
         
         displayMembers();
-        logAccess(getCurrentUser(), 'VIEW_MEMBERS', 'Success');
     </script>
 </body>
 </html>
