@@ -169,15 +169,18 @@
                 membersGrid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><p>No members found. Start by recording contributions.</p></div>';
                 return;
             }
-      membersGrid.innerHTML = members.map(member => `
-<div class="member-card">
-    <div class="member-name">${member.name}</div>
-    <div class="member-info"> Mobile: ${member.mobile}</div>
-    <div class="member-info"> Address: ${member.address}</div>
-    <div class="member-info"> Joining Date: ${member.joiningDate}</div>
-    <div class="member-info"> Monthly Contribution: ₹${member.monthlyContribution}</div>
-</div>
-`).join('');        
+  membersGrid.innerHTML = members.map(member => {
+    return `
+    <div class="member-card">
+        <div class="member-name">${member.name}</div>
+        <div class="member-info"> Mobile: ${member.mobile}</div>
+        <div class="member-info"> Address: ${member.address}</div>
+        <div class="member-info"> Joining Date: ${member.joiningDate}</div>
+        <div class="member-info"> Monthly Contribution: ₹${member.monthlyContribution}</div>
+    </div>
+    `;
+}).join('');
+
         function filterMembers() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const allMembers = JSON.parse(localStorage.getItem('members')) || [];
